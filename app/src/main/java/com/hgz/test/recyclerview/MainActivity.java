@@ -26,9 +26,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //RecyclerView的展示样式
         linearLayoutManager = new LinearLayoutManager(this);
         gridLayoutManager = new GridLayoutManager(this, 3);
+
         //设置RecyclerView的展示样式
         recyclerView.setLayoutManager(linearLayoutManager);
 
+        //gridview的形式展示,可以通过setSpanSizeLookup 来自定义每个item占的列数
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return 3 - position % 3;
+            }
+        });
         MyAdapter myAdapter = new MyAdapter();
         recyclerView.setAdapter(myAdapter);
 
