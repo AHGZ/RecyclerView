@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.widget.Button;
 
@@ -26,9 +27,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //RecyclerView的展示样式
         linearLayoutManager = new LinearLayoutManager(this);
         gridLayoutManager = new GridLayoutManager(this, 3);
-
+        //设置以瀑布流形式展示
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         //设置RecyclerView的展示样式
-        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         //gridview的形式展示,可以通过setSpanSizeLookup 来自定义每个item占的列数
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {

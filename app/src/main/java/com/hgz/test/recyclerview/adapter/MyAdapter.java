@@ -35,7 +35,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
     //绑定数据
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.showImage.setImageResource(R.mipmap.ic_launcher);
+        if (position%2==1){
+            holder.showImage.setImageResource(R.drawable.bagua);
+        }
         holder.showText.setText(list.get(position));
     }
 
