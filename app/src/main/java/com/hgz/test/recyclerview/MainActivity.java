@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.hgz.test.recyclerview.adapter.MyAdapter;
+import com.hgz.test.recyclerview.view.MyDecoration;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //RecyclerView的展示样式
         linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         gridLayoutManager = new GridLayoutManager(this, 3);
         //设置以瀑布流形式展示
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -42,12 +44,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final MyAdapter myAdapter = new MyAdapter();
         recyclerView.setAdapter(myAdapter);
+        //在条目之间增添横线
+        recyclerView.addItemDecoration(new MyDecoration(this,LinearLayoutManager.VERTICAL));
+        //使用单击事件接口，完成添加条目的操作
         myAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(View v, int position) {
                 myAdapter.addItem(position);
             }
         });
+        //使用长按事件接口，完成修改条目的操作
         myAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
             @Override
             public void OnItemLongClick(View v, int position) {
