@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //设置以瀑布流形式展示
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         //设置RecyclerView的展示样式
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         //gridview的形式展示,可以通过setSpanSizeLookup 来自定义每个item占的列数
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -39,9 +39,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return 3 - position % 3;
             }
         });
-        MyAdapter myAdapter = new MyAdapter();
-        recyclerView.setAdapter(myAdapter);
 
+        final MyAdapter myAdapter = new MyAdapter();
+        recyclerView.setAdapter(myAdapter);
+        myAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(View v, int position) {
+                myAdapter.addItem(position);
+            }
+        });
+        myAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
+            @Override
+            public void OnItemLongClick(View v, int position) {
+                myAdapter.updateItem(position);
+            }
+        });
         button.setOnClickListener(this);
     }
 
@@ -57,4 +69,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             recyclerView.setLayoutManager(gridLayoutManager);
         }
     }
+
 }
+
