@@ -20,7 +20,7 @@ import java.util.Set;
  * Created by Administrator on 2017/8/30.
  */
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<String> data;
     HashMap<Integer, Boolean> isCheckedHashMap;
 
@@ -29,7 +29,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         data = new ArrayList<String>();
         for (int i = 0; i < 30; i++) {
             data.add("这是条目" + i);
-            isCheckedHashMap.put(i,false);
+            isCheckedHashMap.put(i, false);
         }
     }
 
@@ -59,49 +59,80 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     //创建布局和viewHolder
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //inflate的时候,需要传入parent和attachToRoot==false; 使用传入三个参数的方法
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view, parent, false);
-        return new MyViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = null;
+        RecyclerView.ViewHolder holder = null;
+        switch (viewType) {
+            case 0:
+                //inflate的时候,需要传入parent和attachToRoot==false; 使用传入三个参数的方法
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view, parent, false);
+                holder = new MyViewHolder(view);
+                break;
+            case 1:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view2, parent, false);
+                holder = new MyViewHolder2(view);
+                break;
+        }
+
+        return holder;
     }
 
     //绑定数据
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
-//        if (position%2==1){
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        //        if (position%2==1){
 //            getImage(data.get(position).getThumbnail_pic_s(),holder.showImage);
 //        }
-        holder.showImage.setImageResource(R.drawable.bagua);
-        holder.showText.setText(data.get(position));
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //暴露一个单击回调接口
-                if (onItemClickListener != null) {
-                    onItemClickListener.OnItemClick(v, position);
-                }
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (onItemLongClickListener != null) {
-                    onItemLongClickListener.OnItemLongClick(v, position);
-                }
-                return true;
-            }
-        });
-        holder.checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isCheckedHashMap.put(position,!isCheckedHashMap.get(position));
-                notifyDataSetChanged();
+        switch (getItemViewType(position)) {
+            case 0:
+                MyViewHolder holder1 = (MyViewHolder) holder;
+                holder1.showImage.setImageResource(R.drawable.bagua);
+                holder1.showText.setText(data.get(position));
+                holder1.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //暴露一个单击回调接口
+                        if (onItemClickListener != null) {
+                            onItemClickListener.OnItemClick(v, position);
+                        }
+                    }
+                });
+                holder1.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        if (onItemLongClickListener != null) {
+                            onItemLongClickListener.OnItemLongClick(v, position);
+                        }
+                        return true;
+                    }
+                });
+                holder1.checkBox.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        isCheckedHashMap.put(position, !isCheckedHashMap.get(position));
+                        notifyDataSetChanged();
 
-                //调用单选方法
-                //singleSelected(position);
-            }
-        });
-        holder.checkBox.setChecked(isCheckedHashMap.get(position));
+                        //调用单选方法
+                        //singleSelected(position);
+                    }
+                });
+                holder1.checkBox.setChecked(isCheckedHashMap.get(position));
+                break;
+            case 1:
+                MyViewHolder2 holder2 = (MyViewHolder2) holder;
+                holder2.item2_iv.setImageResource(R.drawable.xing);
+                holder2.item2_tv.setText(data.get(position));
+                break;
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position % 2 == 0) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     @Override
@@ -125,6 +156,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     }
 
+    public class MyViewHolder2 extends RecyclerView.ViewHolder {
+
+        private final ImageView item2_iv;
+        private final TextView item2_tv;
+
+        public MyViewHolder2(View itemView) {
+            super(itemView);
+            item2_iv = (ImageView) itemView.findViewById(R.id.item2_Iv);
+            item2_tv = (TextView) itemView.findViewById(R.id.item2_Tv);
+        }
+    }
+
     //增加条目的方法
     public void addItem(int position) {
         data.add(position + 1, "这是新添加的条目");
@@ -143,43 +186,46 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         data.add(position, "这是修改的条目");
         notifyItemChanged(position);
     }
+
     //全选的方法
-    public void selectedAll(){
+    public void selectedAll() {
         Set<Map.Entry<Integer, Boolean>> entries = isCheckedHashMap.entrySet();
         //如果发现有没有选中的item,我就应该去全部选中,这个变量就应该设置成true,否则就是false
         boolean shouldSelectedAll = false;
 
         //这个for循环就是判断一下接下来要全部选中,还是全部不选中
-        for (Map.Entry<Integer, Boolean> entry:entries) {
+        for (Map.Entry<Integer, Boolean> entry : entries) {
             Boolean value = entry.getValue();
             //如果有没选中的,那就去全部选中 ,如果发现全都选中了那就全部不选中,
-            if (!value){
-                shouldSelectedAll=true;
+            if (!value) {
+                shouldSelectedAll = true;
                 break;
             }
         }
         //如果shouldSelectedAll为true说明需要全部选中,
         // 如果为false说明没有没有选中的,已经是是全部选中的状态,需要全部不选中
-        for (Map.Entry<Integer, Boolean> entry:entries) {
+        for (Map.Entry<Integer, Boolean> entry : entries) {
             entry.setValue(shouldSelectedAll);
         }
         notifyDataSetChanged();
     }
+
     //反选
-    public void reverseSelected(){
+    public void reverseSelected() {
         Set<Map.Entry<Integer, Boolean>> entries = isCheckedHashMap.entrySet();
-        for (Map.Entry<Integer, Boolean> entry:entries){
+        for (Map.Entry<Integer, Boolean> entry : entries) {
             entry.setValue(!entry.getValue());
         }
         notifyDataSetChanged();
     }
+
     //单选 点击checkBox的时候只选中当前的item,在checkBox的点击事件中调用
-    public void singleSelected(int position){
+    public void singleSelected(int position) {
         Set<Map.Entry<Integer, Boolean>> entries = isCheckedHashMap.entrySet();
-        for (Map.Entry<Integer, Boolean> entry:entries) {
+        for (Map.Entry<Integer, Boolean> entry : entries) {
             entry.setValue(false);
         }
-        isCheckedHashMap.put(position,true);
+        isCheckedHashMap.put(position, true);
         notifyDataSetChanged();
     }
 
